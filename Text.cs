@@ -7,6 +7,7 @@ namespace EB0_Text_Tool
     {
         //NOTE: The order here is based on letter frequency in general fiction, according to http://letterfrequency.org
         //Will this make decoding faster? Who knows! Thought it was a cool idea though
+
         const string TEXT_FOR_00 = "[END]";
         const string TEXT_FOR_01 = "\r\n";
         const string TEXT_FOR_02 = "[PAUSE THEN OVERWRITE]";
@@ -155,8 +156,11 @@ namespace EB0_Text_Tool
 
             foreach (var line in splitString)
             {
-                foreach (char letter in line)
+                foreach (var letter in line)
                 {
+                    if (letter == '[')
+                        currentControlCode = "["; //start building a control code)
+
                     if (currentControlCode != string.Empty)
                     {
                         if (letter == ']')
@@ -190,10 +194,14 @@ namespace EB0_Text_Tool
                                         result.Add(0x80); break;
                                     case "[money]":
                                         result.Add(0xBA); break;
+
+                                    default:
+                                        throw new Exception("Found an unknown control code! → " + currentControlCode);
                                 }
                             }
 
                             currentControlCode = string.Empty;
+                            continue;
                         }
 
                         currentControlCode += letter; //build it up until we have a full code we can compare to the list of codes
@@ -201,14 +209,112 @@ namespace EB0_Text_Tool
 
                     //If the code reaches this part, it wasn't a control code. Convert as char
                     //insert switch statement here
+                    switch (letter)
+                    {
+                        //Punctuation
+                        case '*': result.Add(0xC0); break;
+                        case ' ': result.Add(0xA0); break;
+                        case '.': result.Add(0xAE); break;
+                        case ',': result.Add(0xAC); break;
+                        case '!': result.Add(0xA1); break;
+                        case '?': result.Add(0xA2); break;
+                        case '…': result.Add(0xA3); break;
 
+                        //Lowercase letters
+                        case 'e': result.Add(0xE5); break;
+                        case 't': result.Add(0xF4); break;
+                        case 'a': result.Add(0xE1); break;
+                        case 'o': result.Add(0xEF); break;
+                        case 'h': result.Add(0xE8); break;
+                        case 'n': result.Add(0xEE); break;
+                        case 'i': result.Add(0xE9); break;
+                        case 's': result.Add(0xF3); break;
+                        case 'r': result.Add(0xF2); break;
+                        case 'd': result.Add(0xE4); break;
+                        case 'l': result.Add(0xEC); break;
+                        case 'u': result.Add(0xF5); break;
+                        case 'w': result.Add(0xF7); break;
+                        case 'm': result.Add(0xED); break;
+                        case 'c': result.Add(0xE3); break;
+                        case 'g': result.Add(0xE7); break;
+                        case 'f': result.Add(0xE6); break;
+                        case 'y': result.Add(0xF9); break;
+                        case 'p': result.Add(0xF0); break;
+                        case 'v': result.Add(0xF6); break;
+                        case 'k': result.Add(0xEB); break;
+                        case 'b': result.Add(0xE2); break;
+                        case 'j': result.Add(0xEA); break;
+                        case 'x': result.Add(0xF8); break;
+                        case 'z': result.Add(0xFA); break;
+                        case 'q': result.Add(0xF1); break;
+
+                        //Uppercase letters
+                        case 'E': result.Add(0xC5); break;
+                        case 'T': result.Add(0xD4); break;
+                        case 'A': result.Add(0xC1); break;
+                        case 'O': result.Add(0xCF); break;
+                        case 'H': result.Add(0xC8); break;
+                        case 'N': result.Add(0xCE); break;
+                        case 'I': result.Add(0xC9); break;
+                        case 'S': result.Add(0xD3); break;
+                        case 'R': result.Add(0xD2); break;
+                        case 'D': result.Add(0xC4); break;
+                        case 'L': result.Add(0xCC); break;
+                        case 'U': result.Add(0xD5); break;
+                        case 'W': result.Add(0xD7); break;
+                        case 'M': result.Add(0xCD); break;
+                        case 'C': result.Add(0xC3); break;
+                        case 'G': result.Add(0xC7); break;
+                        case 'F': result.Add(0xC6); break;
+                        case 'Y': result.Add(0xD9); break;
+                        case 'P': result.Add(0xD0); break;
+                        case 'V': result.Add(0xD6); break;
+                        case 'K': result.Add(0xCB); break;
+                        case 'B': result.Add(0xC2); break;
+                        case 'J': result.Add(0xCA); break;
+                        case 'X': result.Add(0xD8); break;
+                        case 'Z': result.Add(0xDA); break;
+                        case 'Q': result.Add(0xD1); break;
+
+                        //Numbers
+                        case '0': result.Add(0xB0); break;
+                        case '1': result.Add(0xB1); break;
+                        case '2': result.Add(0xB2); break;
+                        case '3': result.Add(0xB3); break;
+                        case '4': result.Add(0xB4); break;
+                        case '5': result.Add(0xB5); break;
+                        case '6': result.Add(0xB6); break;
+                        case '7': result.Add(0xB7); break;
+                        case '8': result.Add(0xB8); break;
+                        case '9': result.Add(0xB9); break;
+
+                        //Chars that are almost never in the script text
+                        case '$': result.Add(0xA4); break;
+                        case '•': result.Add(0xA5); break;
+                        case '"': result.Add(0xA6); break;
+                        case '\'':result.Add(0xA7); break;
+                        case '(': result.Add(0xA8); break;
+                        case ')': result.Add(0xA9); break;
+                        case ':': result.Add(0xAA); break;
+                        case ';': result.Add(0xAB); break;
+                        case '-': result.Add(0xAD); break;
+                        case '/': result.Add(0xAF); break;
+                        case 'α': result.Add(0xBB); break;
+                        case 'ß': result.Add(0xBC); break;
+                        case 'τ': result.Add(0xBD); break;
+                        case 'π': result.Add(0xBE); break;
+                        case 'Ω': result.Add(0xBF); break;
+                        case '○': result.Add(0x94); break;
+                        //case '•': result.Add(0x95); break; //TODO: Yup yup duplicate lol
+                        case '♪': result.Add(0x96); break;
+                        case '→': result.Add(0xE0); break;
+                        case '►': result.Add(0xFF); break;
+
+                        default:
+                            throw new Exception("Found an unknown letter! → " + letter.ToString());
+                    }
                 }
             }
-
-
-
-
-            throw new NotImplementedException();
 
             return result.ToArray();
         }
