@@ -37,6 +37,7 @@ namespace EB0_Text_Tool
             else //just hitting enter will insert, since that's probably what people'll be doing 99% of the time they use this tool
             {
                 Console.WriteLine("Inserting text...");
+                //TODO: Make ROM-writing class
             }
 
         }

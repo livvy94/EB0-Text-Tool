@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace EB0_Text_Tool
 {
-    class TextPointerTable
+    public class TextPointerTable
     {
         const int TABLE_OFFSET = 0x030010; //Ends at 0x3177F
 
@@ -38,11 +38,9 @@ namespace EB0_Text_Tool
             return offsets;
         }
 
-        private static byte[] CalculatePointer(int offset)
+        public static byte[] CalculatePointer(int offset)
         {
             //take in an int, spit out [XX XX 00]
-            throw new NotImplementedException();
-
             var pointer = new List<byte>();
             //TODO: calculation goes here
 
@@ -51,6 +49,7 @@ namespace EB0_Text_Tool
             //060010
             //minus 10 for the header (or plus? I forget)
             //turn into bytes, ditch the 06 so it can fit in an Int16 (7FFF)
+            //swap the bytes
 
             pointer.Add(0x00);
             return pointer.ToArray();
