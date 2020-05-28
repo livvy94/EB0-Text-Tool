@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace TextPacker
 {
-    class TextConversion
+    public class TextConversion
     {
         //NOTE: The order here is based on letter frequency in general fiction, according to http://letterfrequency.org
         //Will this make decoding faster? Who knows! Thought it was a cool idea though

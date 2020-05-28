@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace TextPacker
 {
-    class PointerTable
+    public class PointerTable
     {
         const int TABLE_OFFSET = 0x030010; //Ends at 0x3177F
 
@@ -51,6 +51,7 @@ namespace TextPacker
             //turn into bytes, ditch the 06 so it can fit in an Int16 (7FFF)
             //swap the bytes
 
+            pointer.Add(0x00);
             pointer.Add(0x00);
             return pointer.ToArray();
         }
