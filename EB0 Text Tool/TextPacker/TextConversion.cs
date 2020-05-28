@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace EB0_Text_Tool
+namespace TextPacker
 {
-    class Text
+    class TextConversion
     {
         //NOTE: The order here is based on letter frequency in general fiction, according to http://letterfrequency.org
         //Will this make decoding faster? Who knows! Thought it was a cool idea though
@@ -292,7 +292,7 @@ namespace EB0_Text_Tool
                         case '$': result.Add(0xA4); break;
                         case '•': result.Add(0xA5); break;
                         case '"': result.Add(0xA6); break;
-                        case '\'':result.Add(0xA7); break;
+                        case '\'': result.Add(0xA7); break;
                         case '(': result.Add(0xA8); break;
                         case ')': result.Add(0xA9); break;
                         case ':': result.Add(0xAA); break;

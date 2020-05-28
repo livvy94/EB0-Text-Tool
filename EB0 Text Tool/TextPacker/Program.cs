@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace EB0_Text_Tool
+namespace TextPacker
 {
     class Program
     {
@@ -18,7 +18,7 @@ namespace EB0_Text_Tool
                 romPath = Console.ReadLine();
             }
 
-            romPath = FileIO.FileExists(romPath);
+            romPath = ROM_IO.FileExists(romPath);
 
             if (romPath.StartsWith("ERROR")) //existence check
             {
@@ -39,7 +39,6 @@ namespace EB0_Text_Tool
                 Console.WriteLine("Inserting text...");
                 //TODO: Make ROM-writing class
             }
-
         }
     }
 }

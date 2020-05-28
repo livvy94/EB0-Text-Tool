@@ -1,8 +1,8 @@
 ﻿using System.IO;
 
-namespace EB0_Text_Tool
+namespace TextPacker
 {
-    class FileIO
+    class ROM_IO
     {
         internal static string FileExists(string romPath)
         {

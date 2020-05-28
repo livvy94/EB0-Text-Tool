@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace EB0_Text_Tool
+namespace TextPacker
 {
-    public class TextPointerTable
+    class PointerTable
     {
         const int TABLE_OFFSET = 0x030010; //Ends at 0x3177F
 
