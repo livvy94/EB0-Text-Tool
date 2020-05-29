@@ -5,7 +5,11 @@ namespace TextPacker
 {
     public class PointerTable
     {
-        const int TABLE_OFFSET = 0x030010; //Ends at 0x3177F
+        const byte iNES_HEADER_LENGTH = 0x10;
+        const int POINTER_TABLE_START = 0x030000 + iNES_HEADER_LENGTH; //Ends at 0x3177F
+        const int SCRIPT_TEXTBANK_START = 0x060000 + iNES_HEADER_LENGTH;
+        const int SCRIPT_TEXTBANK_END = 0x074000 + iNES_HEADER_LENGTH; //or possibly 070000. Due to the calculation cutting off the 0x06, it might not be possible to go any higher...
+        const int NAMES_TEXTBANK_END = 0x09CC + iNES_HEADER_LENGTH; //This text block starts at 0x00 and ends here. TODO: double-check the value
 
         public static byte[] Generate(List<byte[]> messages)
         {
@@ -22,16 +26,14 @@ namespace TextPacker
         {
             //text lengths -> the offsets to pass into Generate
             var offsets = new List<int>();
-            const int TEXT_OFFSET = 0x060010;
-            const int TOO_MUCH = 0x074010; //or possibly 070000. It might not be possible to go any higher...
 
-            var currentOffset = TEXT_OFFSET;
+            var currentOffset = SCRIPT_TEXTBANK_START;
 
             foreach (var message in messages)
             {
                 offsets.Add(currentOffset);
                 currentOffset += message.Length;
-                if (currentOffset > TOO_MUCH)
+                if (currentOffset > (SCRIPT_TEXTBANK_END))
                     throw new Exception("There's too much text data! It'd overwrite the sprites from the ending cutscene if it keeps going.");
             }
 
@@ -40,20 +42,13 @@ namespace TextPacker
 
         public static byte[] CalculatePointer(int offset)
         {
-            //take in an int, spit out [XX XX 00]
-            var pointer = new List<byte>();
-            //TODO: calculation goes here
+            offset -= iNES_HEADER_LENGTH;
 
-            //account for the iNES header
+            if (offset < NAMES_TEXTBANK_END)
+                offset += 0x8000;
 
-            //060010
-            //minus 10 for the header (or plus? I forget)
-            //turn into bytes, ditch the 06 so it can fit in an Int16 (7FFF)
-            //swap the bytes
-
-            pointer.Add(0x00);
-            pointer.Add(0x00);
-            return pointer.ToArray();
+            var result = BitConverter.GetBytes(offset);
+            return new byte[] { result[0], result[1], 0x00 };
         }
     }
 }

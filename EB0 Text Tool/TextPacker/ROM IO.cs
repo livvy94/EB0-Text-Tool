@@ -17,5 +17,7 @@ namespace TextPacker
 
             return "ERROR! Couldn't find either " + romPath + " or " + longPath;
         }
+
+        //Crazy notion - separate the iNES Header and the rest of the ROM so I don't have to keep adding and subtracting its length from stuff
     }
 }
