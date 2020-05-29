@@ -8,12 +8,12 @@ namespace TextPacker
         const byte iNES_HEADER_LENGTH = 0x10;
         const int POINTER_TABLE_START = 0x030000 + iNES_HEADER_LENGTH; //Ends at 0x3177F
         const int SCRIPT_TEXTBANK_START = 0x060000 + iNES_HEADER_LENGTH;
-        const int SCRIPT_TEXTBANK_END = 0x074000 + iNES_HEADER_LENGTH; //or possibly 070000. Due to the calculation cutting off the 0x06, it might not be possible to go any higher...
+        const int SCRIPT_TEXTBANK_END = 0x074000 + iNES_HEADER_LENGTH; //or possibly 070000. Due to the calculation truncating the leftmost byte, it's probably impossible to go any higher...
         const int NAMES_TEXTBANK_END = 0x09CC + iNES_HEADER_LENGTH; //This text block starts at 0x00 and ends here. TODO: double-check the value
 
         public static byte[] Generate(List<byte[]> messages)
         {
-            var offsets = CalculateOffsets(messages);
+            var offsets = CalculateDialogOffsets(messages);
 
             var result = new List<byte>();
             foreach (var offset in offsets)
@@ -22,7 +22,7 @@ namespace TextPacker
             return result.ToArray();
         }
 
-        private static List<int> CalculateOffsets(List<byte[]> messages)
+        private static List<int> CalculateDialogOffsets(List<byte[]> messages)
         {
             //text lengths -> the offsets to pass into Generate
             var offsets = new List<int>();
@@ -33,7 +33,9 @@ namespace TextPacker
             {
                 offsets.Add(currentOffset);
                 currentOffset += message.Length;
-                if (currentOffset > (SCRIPT_TEXTBANK_END))
+
+                var remainingFreeSpace = SCRIPT_TEXTBANK_END - currentOffset;
+                if (remainingFreeSpace < 0)
                     throw new Exception("There's too much text data! It'd overwrite the sprites from the ending cutscene if it keeps going.");
             }
 

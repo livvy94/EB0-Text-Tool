@@ -33,11 +33,12 @@ namespace TextPacker
             if (input.ToLower().StartsWith("d"))
             {
                 Console.WriteLine("Dumping text...");
+                //TODO: Make ROM-reading stuff
             }
             else //just hitting enter will insert, since that's probably what people'll be doing 99% of the time they use this tool
             {
                 Console.WriteLine("Inserting text...");
-                //TODO: Make ROM-writing class
+                //TODO: Make ROM-writing stuff
             }
         }
     }

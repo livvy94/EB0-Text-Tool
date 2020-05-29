@@ -9,10 +9,11 @@ namespace TextPacker
         //Will this make decoding faster? Who knows! Thought it was a cool idea though
 
         const string TEXT_FOR_00 = "[END]";
-        const string TEXT_FOR_01 = "\r\n";
+        const string TEXT_FOR_01 = "\r\n"; //I wonder if this will look good when I get dumping working...
         const string TEXT_FOR_02 = "[PAUSE THEN OVERWRITE]";
         const string TEXT_FOR_03 = "[NEXT]";
         const string TEXT_FOR_05 = "[PADDING]";
+        //TODO: Control codes that are only present in the bank-related parts of the script
 
         public string Decode(byte[] hexNumbers)
         {
@@ -167,37 +168,33 @@ namespace TextPacker
                         {
                             //We now have a complete control code, ready for conversion
 
-                            if (currentControlCode.Length == 4) //For straight-up hex numbers like "[05]"
-                                result.Add(ConvertHexString(currentControlCode));
-                            else
+                            switch (currentControlCode)
                             {
-                                switch (currentControlCode)
-                                {
-                                    case TEXT_FOR_01:
-                                        result.Add(0x01); break;
-                                    case TEXT_FOR_02:
-                                        result.Add(0x02); break;
-                                    case TEXT_FOR_03:
-                                        result.Add(0x03); break;
-                                    case TEXT_FOR_00:
-                                        result.Add(0x00); break;
-                                    case TEXT_FOR_05:
-                                        result.Add(0x05); break;
+                                case TEXT_FOR_01:
+                                    result.Add(0x01); break;
+                                case TEXT_FOR_02:
+                                    result.Add(0x02); break;
+                                case TEXT_FOR_03:
+                                    result.Add(0x03); break;
+                                case TEXT_FOR_00:
+                                    result.Add(0x00); break;
+                                case TEXT_FOR_05:
+                                    result.Add(0x05); break;
 
-                                    case "[ll]":
-                                        result.Add(0x82); break;
-                                    case "[il]":
-                                        result.Add(0x81); break;
-                                    case "['s]":
-                                        result.Add(0x83); break;
-                                    case "[in]":
-                                        result.Add(0x80); break;
-                                    case "[money]":
-                                        result.Add(0xBA); break;
+                                case "[ll]":
+                                    result.Add(0x82); break;
+                                case "[il]":
+                                    result.Add(0x81); break;
+                                case "['s]":
+                                    result.Add(0x83); break;
+                                case "[in]":
+                                    result.Add(0x80); break;
+                                case "[money]":
+                                    result.Add(0xBA); break;
 
-                                    default:
-                                        throw new Exception("Found an unknown control code! → " + currentControlCode);
-                                }
+                                default: //If it's not any of these things, the only other thing it could be is a hex literal like [05]
+                                    result.Add(ConvertHexString(currentControlCode));
+                                    break;
                             }
 
                             currentControlCode = string.Empty;
@@ -321,15 +318,26 @@ namespace TextPacker
 
         private byte ConvertHexString(string input)
         {
-            if (input[0] == '[')
-                input = RemoveBrackets(input);
+            input = TrimHexString(input);
 
-            return byte.Parse(input, System.Globalization.NumberStyles.HexNumber);
+            try
+            {
+                return byte.Parse(input, System.Globalization.NumberStyles.HexNumber);
+            }
+            catch
+            {
+                throw new Exception("ERROR: Unknown control code, DTE character, or hex number → " + input);
+            }
         }
 
-        private string RemoveBrackets(string input)
+        private string TrimHexString(string input)
         {
-            return input.TrimStart('[').TrimEnd(']');
+            var result = input.TrimStart('[').TrimEnd(']').Trim();
+
+            if (result.StartsWith("0x"))
+                result = result.Remove(0, 2);
+
+            return result;
         }
     }
 }
