@@ -14,13 +14,11 @@ namespace TextPacker
                 //If nothing comes up, ask for a filename
                 Console.WriteLine("Please type the filename of the ROM you want to open.");
                 Console.WriteLine("(For future reference, you can drag and drop it or use command line arguments!)");
-
                 romPath = Console.ReadLine();
             }
 
             romPath = ROM_IO.FileExists(romPath);
-
-            if (romPath.StartsWith("ERROR")) //existence check
+            if (romPath.StartsWith("ERROR"))
             {
                 Console.WriteLine(romPath);
                 Console.ReadLine();

@@ -5,14 +5,15 @@ namespace TextPacker
 {
     public class PointerTable
     {
-        const byte iNES_HEADER_LENGTH = 0x10;
-        const int POINTER_TABLE_START = 0x030000 + iNES_HEADER_LENGTH; //Ends at 0x3177F
-        const int SCRIPT_TEXTBANK_START = 0x060000 + iNES_HEADER_LENGTH;
-        const int SCRIPT_TEXTBANK_END = 0x074000 + iNES_HEADER_LENGTH; //or possibly 070000. Due to the calculation truncating the leftmost byte, it's probably impossible to go any higher...
-        const int NAMES_TEXTBANK_END = 0x09CC + iNES_HEADER_LENGTH; //This text block starts at 0x00 and ends here. TODO: double-check the value
+        public const int POINTER_TABLE_START = 0x030000 + ROM_IO.iNES_HEADER_LENGTH;
+        public const int POINTER_TABLE_END = 0x03177F; //TODO: double-check the value
+        public const int SCRIPT_TEXTBANK_START = 0x060000 + ROM_IO.iNES_HEADER_LENGTH;
+        public const int SCRIPT_TEXTBANK_END = 0x070000 + ROM_IO.iNES_HEADER_LENGTH;
+        public const int NAMES_TEXTBANK_END = 0x09CC + ROM_IO.iNES_HEADER_LENGTH; //This text block starts at 0x00 and ends here. TODO: double-check the value
 
         public static byte[] Generate(List<byte[]> messages)
         {
+            //takes in a list of the byte arrays TextConversion.Encode() produces
             var offsets = CalculateDialogOffsets(messages);
 
             var result = new List<byte>();
@@ -36,7 +37,7 @@ namespace TextPacker
 
                 var remainingFreeSpace = SCRIPT_TEXTBANK_END - currentOffset;
                 if (remainingFreeSpace < 0)
-                    throw new Exception("There's too much text data! It'd overwrite the sprites from the ending cutscene if it keeps going.");
+                    throw new Exception("The script text bank is full! If it kept going, the pointers would wrap back around and it wouldn't work.");
             }
 
             return offsets;
@@ -44,7 +45,7 @@ namespace TextPacker
 
         public static byte[] CalculatePointer(int offset)
         {
-            offset -= iNES_HEADER_LENGTH;
+            offset -= ROM_IO.iNES_HEADER_LENGTH;
 
             if (offset < NAMES_TEXTBANK_END)
                 offset += 0x8000;
