@@ -6,7 +6,29 @@ namespace TextPacker
 {
     class ROM_IO
     {
-        public const byte iNES_HEADER_LENGTH = 0x10;
+        private const byte iNES_HEADER_LENGTH = 0x10;
+
+        internal static List<uint> LoadTextPointerTable(byte[] ROM)
+        {
+            var PointerTableContents = new List<uint>();
+            for (int i = PointerTable.POINTER_TABLE_START; i < PointerTable.POINTER_TABLE_END; i += 3)
+            {
+                var currentPointer = PointerTable.BytesToOffset(ROM[i], ROM[i + 1], 0x06 );
+                PointerTableContents.Add(currentPointer);
+            }
+
+            return PointerTableContents;
+        }
+
+
+        internal static byte[] LoadROM(string romPath)
+        {
+            //Crazy notion - separate the iNES Header and the rest of the ROM so I don't have to keep adding and subtracting its length from stuff
+            var ROM = File.ReadAllBytes(romPath);
+            var HeaderlessROM = new byte[ROM.Length - iNES_HEADER_LENGTH];
+            Array.Copy(ROM, 0x10, HeaderlessROM, 0, HeaderlessROM.Length); //Is there a better technique for removing the first 0x10 bytes of an array? I wouldn't need "using System" if not for this line
+            return HeaderlessROM; //I wonder if this will work lol
+        }
 
         internal static string FileExists(string romPath)
         {
@@ -20,27 +42,6 @@ namespace TextPacker
                 return longPath;
 
             return "ERROR! Couldn't find " + romPath;
-        }
-
-        internal byte[] LoadROM(string romPath)
-        {
-            //Crazy notion - separate the iNES Header and the rest of the ROM so I don't have to keep adding and subtracting its length from stuff
-            var ROM = File.ReadAllBytes(romPath);
-            var HeaderlessROM = new byte[ROM.Length - iNES_HEADER_LENGTH];
-            Array.Copy(ROM, 0x10, HeaderlessROM, 0, HeaderlessROM.Length);
-            return HeaderlessROM; //I wonder if this will work lol
-        }
-
-        internal List<byte[]> LoadPointerTable(byte[] ROM)
-        {
-            //go to 030000
-            //read up to the end
-            var PointerTableContents = new List<byte[]>();
-            for (int i = 0x030000 + iNES_HEADER_LENGTH; i < 0x3176F + iNES_HEADER_LENGTH; i += 3)
-            {
-                PointerTableContents.Add(new byte[] { ROM[i], ROM[i + 1], ROM[i + 2] });
-            }
-            return PointerTableContents;
         }
     }
 }

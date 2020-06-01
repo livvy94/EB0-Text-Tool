@@ -5,11 +5,11 @@ namespace TextPacker
 {
     public class PointerTable
     {
-        public const int POINTER_TABLE_START = 0x030000 + ROM_IO.iNES_HEADER_LENGTH;
+        public const int POINTER_TABLE_START = 0x030000;
         public const int POINTER_TABLE_END = 0x03177F; //TODO: double-check the value
-        public const int SCRIPT_TEXTBANK_START = 0x060000 + ROM_IO.iNES_HEADER_LENGTH;
-        public const int SCRIPT_TEXTBANK_END = 0x070000 + ROM_IO.iNES_HEADER_LENGTH;
-        public const int NAMES_TEXTBANK_END = 0x09CC + ROM_IO.iNES_HEADER_LENGTH; //This text block starts at 0x00 and ends here. TODO: double-check the value
+        public const int SCRIPT_TEXTBANK_START = 0x060000;
+        public const int SCRIPT_TEXTBANK_END = 0x070000;
+        public const int NAMES_TEXTBANK_END = 0x09CC; //This text block starts at 0x00 and ends here. TODO: double-check the value
 
         public static byte[] Generate(List<byte[]> messages)
         {
@@ -45,13 +45,19 @@ namespace TextPacker
 
         public static byte[] CalculatePointer(int offset)
         {
-            offset -= ROM_IO.iNES_HEADER_LENGTH;
+            //offset -= ROM_IO.iNES_HEADER_LENGTH;
 
             if (offset < NAMES_TEXTBANK_END)
                 offset += 0x8000;
 
             var result = BitConverter.GetBytes(offset);
             return new byte[] { result[0], result[1], 0x00 };
+        }
+
+        public static uint BytesToOffset(byte input1, byte input2, byte currentBank)
+        {
+            var RawPointer = new byte[] { input1, input2, currentBank, 0x00 };
+            return BitConverter.ToUInt32(RawPointer);
         }
     }
 }

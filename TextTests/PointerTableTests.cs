@@ -13,15 +13,21 @@ namespace TextTests
         [Test]
         public void CalculatePointer_ForDialogTextBank()
         {
-            var foo = PointerTable.CalculatePointer(0x06F197);
-            Assert.AreEqual(new byte[] { 0x87, 0xF1, 0x00 }, foo);
+            var pointer = PointerTable.CalculatePointer(0x06F187);
+            Assert.AreEqual(new byte[] { 0x87, 0xF1, 0x00 }, pointer);
         }
 
+        //[Test]
+        //public void CalculatePointer_ForNames()
+        //{
+        //    var pointer = PointerTable.CalculatePointer(0x00);
+        //    Assert.AreEqual(new byte[] { 0x00, 0x00, 0x00 }, pointer); //TODO: Look in the ROM for the correct values
+        //}
+
         [Test]
-        public void CalculatePointer_ForNames()
+        public void ConvertTPTEntry()
         {
-            var foo = PointerTable.CalculatePointer(0x00);
-            Assert.AreEqual(new byte[] { 0x00, 0x00, 0x00 }, foo); //TODO: Look in the ROM for the correct values
+            Assert.AreEqual(0x06F187, PointerTable.BytesToOffset(0x87, 0xF1, 0x06));
         }
     }
 }
